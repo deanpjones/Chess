@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <!-- *************************************** -->
+    <!-- CHESS GAME ENGINE (main html) -->
+    <!-- DEAN JONES  -->
+    <!-- Dec.10, 2017 -->
+    <!-- *************************************** -->
+
+    <!-- NODE.JS SERVER, server.js (at terminal type... node server.js) to run -->
+    <!-- GAME LOGIC, js/game.js -->
+
+    <title>Chess</title>
+    <!-- LOADING SCRIPTS  -->
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+
+    <!-- LOAD GAME JS -->
+    <!-- <script type="text/javascript" src="js/game.js"></script> -->
+
+    <!-- STYLESHEET -->
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+
+    <style>
+        .message{
+            position: absolute;
+            top: auto;
+            height: auto;
+            visibility: hidden;
+        }
+
+        /* text highlighting blue on doubleclick */ 
+        svg text {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            pointer-events: none;
+        }
+    
+    </style>
+</head>
+
+<body>
+    <h1>Chess</h1>
+    <div id="grid" style="background: none"></div>
+
+    <script>
+    
+    //variables
+	var h = 640;		
+    var w = 640;
+    var offsetX = 50;   //offset grid from main svg
+    var offsetY = 50;
+    
+    function gridData() {
+        var data = new Array();
+        var xpos = 1; //starting xpos and ypos at 1 so the stroke will show when we make the grid below
+        var ypos = 1;
+        var width = 50;
+        var height = 50;
+        var grid = [ "a", "b", "c", "d", "e", "f", "g", "h" ];
+        
+        // iterate for rows	
+        for (var row = 0; row < 8; row++) {
+            data.push( new Array() );
+            
+            // iterate for cells/columns inside rows
+            for (var column = 0; column < 8; column++) {
+                data[row].push({
+                    name: "" + grid[column] + (row + 1),
+                    x: xpos,
+                    y: ypos,
+                    width: width,
+                    height: height,            
+                })
+                // increment the x position. I.e. move it over by 50 (width variable)
+                xpos += width;
+            }
+            // reset the x position after a row is complete
+            xpos = 1;
+            // increment the y position for the next row. Move it down 50 (height variable)
+            ypos += height;	
+        }
+        return data;
+    }
+
+    //dataset
+    var gridData = gridData();	
+    console.log(gridData);
+
+    var grid = d3.select("#grid")
+        .append("svg")
+        .attr("width", w)
+        .attr("height", h)
+        .attr("class", "centerAll")       //center on screen (CSS)
+        ;
+
+    //defs (for shadow)
+    var defs = d3.select("svg")
+        .append("defs")
+        .append("filter")
+        .attr("id", "blurFilter").attr("y", -5).attr("height", 40)
+        .append("feGaussianBlur")
+        .attr("in", "SourceGraphic").attr("stdDeviation", 5).attr("y", "2")
+        ;
+
+    //formatting
+    var grid2 = grid.append("g")
+        .attr("fill", "#6A8AB2")
+		.attr("stroke", "#020E1F")
+        .attr("stroke-width", 5)
+        ;  
+    
+    //add shadow	
+    grid2.append("rect")        
+        .attr("id", function(d){ return "shadow"; })              
+        .attr("fill", "#808080")
+        .attr("stroke", "#808080")
+        .attr("opacity", 0.75)
+        .attr("filter", "url(#blurFilter)")
+		.attr("x", function() {
+				return offsetX + 15;  
+			})
+		.attr("y", function() {
+				return offsetY + 15;  
+		 })
+		.attr("width", 50 * 8)
+        .attr("height",  50 * 8)
+        ;
+    
+    //add rows
+    var row = grid2.selectAll(".row")
+        .data(gridData)
+        .enter()
+
+        .append("g")
+        .attr("class", "row")
+        ;
+    
+    //add columns
+    var column = row.selectAll(".cell")
+        .data(function(d) { return d; })
+        .enter()
+
+        .append("rect")
+        .attr("class","cell")
+        .attr("id", function(d) { return d.name; })
+        .attr("x", function(d) { return d.x + offsetX; })
+        .attr("y", function(d) { return d.y + offsetY; })
+        .attr("width", function(d) { return d.width; })
+        .attr("height", function(d) { return d.height; })
+        ;
+
+
+
+    // //svg
+	// var svg = d3.select("body")			   
+    //     .append("svg")
+    //     .attr("id", "chess")
+	// 	.attr("width", w)
+    //     .attr("height", h)
+    //     .attr("class", "centerAll")       //center on screen (CSS)
+    //     ;
+    // // //defs  
+    // // var defs = d3.select("svg")
+    // //     .append("defs")
+    // //     .append("filter")
+    // //     .attr("id", "blurFilter").attr("y", -5).attr("height", 40)
+    // //     .append("feGaussianBlur")
+    // //     .attr("in", "SourceGraphic").attr("stdDeviation", 5).attr("y", "2")
+    // //     ;
+    // // //----------
+    // // //DRAW BOARD
+    // //formatting
+	// var group = d3.select("svg")
+	// 	.append("g")
+    //     .attr("fill", "#ff9326")
+	// 	.attr("stroke", "black")
+    //     .attr("stroke-width", 5)
+    //     ;  
+    // console.log(group);
+    // //add rows
+    // var rows = group.selectAll("g")
+	// 	.data(dataset[0])   //access row array
+	// 	.enter()									
+    //     .append("g")  
+    //     .attr("id", function(d, i){ return "row" + d; })               //attribute id (to grab this square)
+    //     ;
+    // console.log(rows);
+    // //add elements to each row
+    // var elems = rows.selectAll("g")
+    //     .data(dataset[1])   //access column array
+    //     .enter()
+    //     .append("g")
+    //     .attr("id", function(d, i){ return "col" + d; })
+    //     ;
+    // console.log(elems);
+    // //add rects 
+    // var x = elems.append("rect")
+    //     .attr("id", function(d){ return "rect" + d; })               //attribute id (to grab this square)
+	// 	.attr("x", function(d, i) {
+	// 			return (i % 8) * cellW + offsetX;  
+	// 		})
+	// 	// .attr("y", function(d, i) {
+	// 	// 		return (Math.floor(i / 8)) * cellH + offsetY;  
+    //     //  })
+    //     .attr("y", function(d, i) {
+	// 			return (Math.floor(i / 8)) * cellH + offsetY;  
+	// 	 })
+	// 	.attr("width", cellW)
+    //     .attr("height",  cellH)
+    //     ;
+    // console.log(x);
+
+    // //add rects (shadow)		
+    // gs.append("rect")        
+    //     .attr("id", function(d){ return "shadow" + d; })               //attribute id (to grab this square)
+    //     .attr("fill", "#808080")
+    //     .attr("stroke", "#808080")
+    //     .attr("opacity", 0.75)
+    //     .attr("filter", "url(#blurFilter)")
+	// 	.attr("x", function(d, i) {
+	// 			return (d % 8) * cellW + offsetX +15;  
+	// 		})
+	// 	.attr("y", function(d, i) {
+	// 			return (Math.floor(d / 8)) * cellH + offsetY + 15;  
+	// 	 })
+	// 	.attr("width", cellW)
+    //     .attr("height",  cellH)
+    // //add rects
+    // gs.append("rect")
+    //     .attr("id", function(d){ return "rect" + d; })               //attribute id (to grab this square)
+	// 	.attr("x", function(d, i) {
+	// 			return (d % 8) * cellW + offsetX;  
+	// 		})
+	// 	.attr("y", function(d, i) {
+	// 			return (Math.floor(d / 8)) * cellH + offsetY;  
+	// 	 })
+	// 	.attr("width", cellW)
+    //     .attr("height",  cellH)
+    //     ;
+    // //add text
+    // gs.append("text")
+    //     .attr("id", function(d){ return "txt" + d; })               //attribute id (to grab this text)
+    //     .attr("text-anchor", "middle")          //start, middle, end (horizontal alignment)
+    //     .attr("alignment-baseline", "middle")   //middle, central (vertical align) 
+    //                                             //or... alphabetic,ideographic,hanging,mathematical,central
+    //     .attr("x", function(d, i) {
+    //         return (d % 8) * cellW + offsetX + 50;  
+    //         })
+    //     .attr("y", function(d, i) {
+    //             return (Math.floor(d / 8)) * cellH + offsetY + 50;  
+    //     })
+    //     .attr("font-family", "sans-serif")
+    //     .attr("font-size", 40)
+    //     .text("X")
+    //     ;
+    </script>
+</body>
+
+</html>
