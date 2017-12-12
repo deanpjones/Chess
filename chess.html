@@ -48,13 +48,150 @@
     <div id="grid" style="background: none"></div>
 
     <script>
-    
+
     //variables
 	var h = 640;		
     var w = 640;
     var offsetX = 50;   //offset grid from main svg
     var offsetY = 50;
+    var gridColorBlack = "gray";
+    var gridColorWhite = "white";
     
+    //objects
+    // var COLOR = {
+    //     BLACK: -1,
+    //     EMPTY: 0,
+    //     WHITE: 1
+    // }
+    
+    var COLOR = {
+        BLACK: "black",
+        EMPTY: "empty",
+        WHITE: "white"
+    }
+
+    //cell definition
+    var CELL = {
+        gridId: -1,                 //gridId (0-63)
+        color: COLOR.EMPTY,
+        //piece: PIECE[0]             //set to NONE (by default)
+        piece: PIECE.NONE           //set to NONE (by default)
+    }
+
+    //grid definition
+    // var GRID = {
+    //     //constructor
+    //     GRID: function(){
+
+    //     }
+    // }
+
+    //piece objects
+    var PIECE = {
+        //1: { name: "pawn", pieceValue: 1, position: -1 },
+        NONE: { name: "none", pieceValue: 0 },
+        PAWN: { name: "pawn", pieceValue: 1 },
+        ROOK: { name: "rook", pieceValue: 5 },
+        KNIGHT: { name: "knight", pieceValue: 3 },
+        BISHOP: { name: "bishop", pieceValue: 3 },
+        QUEEN: { name: "queen", pieceValue: 8 },
+        KING: { name: "king", pieceValue: 10 }
+    }
+    // var PIECE = {
+    //     //1: { name: "pawn", pieceValue: 1, position: -1 },
+    //     0: { name: "none", pieceValue: 0 },
+    //     1: { name: "pawn", pieceValue: 1 },
+    //     2: { name: "rook", pieceValue: 5 },
+    //     3: { name: "knight", pieceValue: 3 },
+    //     4: { name: "bishop", pieceValue: 3 },
+    //     5: { name: "queen", pieceValue: 8 },
+    //     6: { name: "king", pieceValue: 10 }
+    // }
+
+    //player object 
+    var PLAYER1 = {
+        color: "white",
+        isTurn: true,
+    }
+
+    //player object 
+    var PLAYER2 = {
+        color: "black",
+        isTurn: false
+    }
+
+    // //board object
+    // var BOARD = {
+    //     color: [
+    //         [-1,-1,-1,-1,-1,-1,-1,-1],
+    //         [-1,-1,-1,-1,-1,-1,-1,-1],
+    //         [0,0,0,0,0,0,0,0],
+    //         [0,0,0,0,0,0,0,0],
+    //         [0,0,0,0,0,0,0,0],
+    //         [0,0,0,0,0,0,0,0],
+    //         [1,1,1,1,1,1,1,1],
+    //         [1,1,1,1,1,1,1,1]
+    //     ],
+    //     pieces: [
+    //         [-1,-1,-1,-1,-1,-1,-1,-1],
+    //         [-1,-1,-1,-1,-1,-1,-1,-1],
+    //         [-1,-1,-1,-1,-1,-1,-1,-1],
+    //         [-1,-1,-1,-1,-1,-1,-1,-1],
+    //         [-1,-1,-1,-1,-1,-1,-1,-1],
+    //         [-1,-1,-1,-1,-1,-1,-1,-1],
+    //         [-1,-1,-1,-1,-1,-1,-1,-1],
+    //         [-1,-1,-1,-1,-1,-1,-1,-1]
+    //     ],
+    //     testRange: function(n){
+    //         return utilNum.isRange(n, 0, 63);
+    //     }    
+    // }
+
+    //UTILITY FUNCTIONS
+    var util = {
+        //is Undefined (boole) (works for null or undefined or functions that have no return value)
+        isUndefinedOrNull: function(obj){
+            return obj == undefined;          
+        }
+    }
+    var utilNum = {
+        //is Number (boole)
+        isNumber: function (n){
+        	return typeof(n) == "number";
+        },  
+        //is number within a range (boole)
+        isRange: function (n, min, max){
+        	return min <= n && n <= max;
+        },     
+        //is Number Positive (boole)
+        isNumPositive: function (n){
+            return n > 0;
+        },
+        //is Number Negative (boole)
+        isNumNegative: function (n){
+            return n < 0;
+        },
+        //is Number Zero (boole)
+        isNumZero: function (n){
+            return n == 0;
+        }
+    }
+    var utilStr = {   
+        //is String (boole)
+        isString: function (s){
+        	return typeof(s) == "string";
+        },    
+        //is String empty (boole)
+        isEmpty: function (s){
+            return s == "";
+        },
+        //is String within range (boole)
+        isRange(s, min, max){
+            return min <= s.length && s.length <= max; 
+        }
+    }
+
+    //grid object
     function gridData() {
         var data = new Array();
         var xpos = 1; //starting xpos and ypos at 1 so the stroke will show when we make the grid below
@@ -71,10 +208,14 @@
             for (var column = 0; column < 8; column++) {
                 data[row].push({
                     name: "" + grid[column] + (row + 1),
+                    row: row,
+                    column: column,
+                    gridId: 8 * row + column,      
                     x: xpos,
                     y: ypos,
                     width: width,
-                    height: height,            
+                    height: height, 
+                    cell: CELL              //add CELL OBJECT        
                 })
                 // increment the x position. I.e. move it over by 50 (width variable)
                 xpos += width;
@@ -115,7 +256,7 @@
         ;  
     
     //add shadow	
-    grid2.append("rect")        
+    grid2.append("rect")     
         .attr("id", function(d){ return "shadow"; })              
         .attr("fill", "#808080")
         .attr("stroke", "#808080")
@@ -152,6 +293,18 @@
         .attr("y", function(d) { return d.y + offsetY; })
         .attr("width", function(d) { return d.width; })
         .attr("height", function(d) { return d.height; })
+        //make fill checkered
+        .attr("fill", function (d) {
+			//if(d.gridId % 8 == 1)             //highlights column (0-7)(8x8 grid)
+			if((d.gridId + d.row) % 2 == 1)     //logic for (checkered grid)(flip == 0 or == 1 to change order)           
+			{               
+				return gridColorBlack;
+			}
+			else
+			{
+				return gridColorWhite;
+            }	
+        })
         ;
 
 
