@@ -19,6 +19,12 @@
     <!-- LOAD GAME JS -->
     <!-- <script type="text/javascript" src="js/game.js"></script> -->
 
+    <!-- LOAD JAVASCRIPT -->
+    <script type="text/javascript" src="js/util.js"></script>   <!-- UTILITY FUNCTIONS -->
+    <script type="text/javascript" src="js/user.js"></script>   <!-- USER FUNCTIONS -->
+    <script type="text/javascript" src="js/rules.js"></script>   <!-- RULES FUNCTIONS -->
+    <script type="text/javascript" src="js/player.js"></script>   <!-- PLAYER OBJECTS -->
+
     <!-- STYLESHEET -->
     <link rel="stylesheet" type="text/css" href="/css/style.css" />
 
@@ -76,68 +82,73 @@
     var gridColorBlack = "gray";
     var gridColorWhite = "white";
     
-    //objects
-    // var COLOR = {
-    //     BLACK: -1,
-    //     EMPTY: 0,
-    //     WHITE: 1
-    // }
+    // //objects
+    // // var COLOR = {
+    // //     BLACK: -1,
+    // //     EMPTY: 0,
+    // //     WHITE: 1
+    // // }
     
-    var COLOR = {
-        BLACK: "black",
-        EMPTY: "empty",
-        WHITE: "white"
-    }
-
-    //grid definition
-    // var GRID = {
-    //     //constructor
-    //     GRID: function(){
-
-    //     }
+    // var COLOR = {
+    //     BLACK: "black",
+    //     EMPTY: "empty",
+    //     WHITE: "white"
     // }
 
-    //piece objects
-    var PIECE = {
-        //1: { name: "pawn", pieceValue: 1, position: -1 },
-        NONE: { name: "none", pieceValue: 0 },
-        PAWN: { name: "pawn", pieceValue: 1 },
-        ROOK: { name: "rook", pieceValue: 5 },
-        KNIGHT: { name: "knight", pieceValue: 3 },
-        BISHOP: { name: "bishop", pieceValue: 3 },
-        QUEEN: { name: "queen", pieceValue: 8 },
-        KING: { name: "king", pieceValue: 10 }
-    }
+    // //grid definition
+    // // var GRID = {
+    // //     //constructor
+    // //     GRID: function(){
+
+    // //     }
+    // // }
+
+    // //piece objects
     // var PIECE = {
     //     //1: { name: "pawn", pieceValue: 1, position: -1 },
-    //     0: { name: "none", pieceValue: 0 },
-    //     1: { name: "pawn", pieceValue: 1 },
-    //     2: { name: "rook", pieceValue: 5 },
-    //     3: { name: "knight", pieceValue: 3 },
-    //     4: { name: "bishop", pieceValue: 3 },
-    //     5: { name: "queen", pieceValue: 8 },
-    //     6: { name: "king", pieceValue: 10 }
+    //     NONE: { name: "none", pieceValue: 0 },
+    //     PAWN: { name: "pawn", pieceValue: 1 },
+    //     ROOK: { name: "rook", pieceValue: 5 },
+    //     KNIGHT: { name: "knight", pieceValue: 3 },
+    //     BISHOP: { name: "bishop", pieceValue: 3 },
+    //     QUEEN: { name: "queen", pieceValue: 8 },
+    //     KING: { name: "king", pieceValue: 10 }
+    // }
+    // // var PIECE = {
+    // //     //1: { name: "pawn", pieceValue: 1, position: -1 },
+    // //     0: { name: "none", pieceValue: 0 },
+    // //     1: { name: "pawn", pieceValue: 1 },
+    // //     2: { name: "rook", pieceValue: 5 },
+    // //     3: { name: "knight", pieceValue: 3 },
+    // //     4: { name: "bishop", pieceValue: 3 },
+    // //     5: { name: "queen", pieceValue: 8 },
+    // //     6: { name: "king", pieceValue: 10 }
+    // // }
+
+    // var gridPiece1 = {
+    //     color: COLOR.BLACK,
+    //     piece: PIECE.KNIGHT
     // }
 
-    //cell definition
-    var CELL = {
-        gridId: -1,                 //gridId (0-63)
-        color: COLOR.EMPTY,
-        //piece: PIECE[0]             //set to NONE (by default)
-        piece: PIECE.NONE           //set to NONE (by default)
-    }
+    // //cell definition
+    // var CELL = {
+    //     gridId: -1,                 //gridId (0-63)
+    //     color: COLOR.EMPTY,
+    //     //piece: PIECE[0]             //set to NONE (by default)
+    //     piece: PIECE.NONE           //set to NONE (by default)
+    // }
 
-    //player object 
-    var PLAYER1 = {
-        color: "white",
-        isTurn: true,
-    }
+    // //player object 
+    // var PLAYER1 = {
+    //     color: "white",
+    //     isTurn: true,
+    // }
 
-    //player object 
-    var PLAYER2 = {
-        color: "black",
-        isTurn: false
-    }
+    // //player object 
+    // var PLAYER2 = {
+    //     color: "black",
+    //     isTurn: false
+    // }
 
     // //board object
     // var BOARD = {
@@ -166,86 +177,86 @@
     //     }    
     // }
 
-    //UTILITY FUNCTIONS
-    var util = {
-        //is Undefined (boole) (works for null or undefined or functions that have no return value)
-        isUndefinedOrNull: function(obj){
-            return obj == undefined;          
-        }
-    }
-    var utilNum = {
-        //is Number (boole)
-        isNumber: function (n){
-        	return typeof(n) == "number";
-        },  
-        //is number within a range (boole)
-        isRange: function (n, min, max){
-        	return min <= n && n <= max;
-        },     
-        //is Number Positive (boole)
-        isNumPositive: function (n){
-            return n > 0;
-        },
-        //is Number Negative (boole)
-        isNumNegative: function (n){
-            return n < 0;
-        },
-        //is Number Zero (boole)
-        isNumZero: function (n){
-            return n == 0;
-        }
-    }
-    var utilStr = {   
-        //is String (boole)
-        isString: function (s){
-        	return typeof(s) == "string";
-        },    
-        //is String empty (boole)
-        isEmpty: function (s){
-            return s == "";
-        },
-        //is String within range (boole)
-        isRange(s, min, max){
-            return min <= s.length && s.length <= max; 
-        }
-    }
-    //TODO: how to load an (a file) for separating SVG 
-    var utilFile = {
-        loadJs: function(path) {
-            script = document.createElement("script");
-            script.setAttribute("type", "text/javascript");
-            script.setAttribute("src", path);
+    // //UTILITY FUNCTIONS
+    // var util = {
+    //     //is Undefined (boole) (works for null or undefined or functions that have no return value)
+    //     isUndefinedOrNull: function(obj){
+    //         return obj == undefined;          
+    //     }
+    // }
+    // var utilNum = {
+    //     //is Number (boole)
+    //     isNumber: function (n){
+    //     	return typeof(n) == "number";
+    //     },  
+    //     //is number within a range (boole)
+    //     isRange: function (n, min, max){
+    //     	return min <= n && n <= max;
+    //     },     
+    //     //is Number Positive (boole)
+    //     isNumPositive: function (n){
+    //         return n > 0;
+    //     },
+    //     //is Number Negative (boole)
+    //     isNumNegative: function (n){
+    //         return n < 0;
+    //     },
+    //     //is Number Zero (boole)
+    //     isNumZero: function (n){
+    //         return n == 0;
+    //     }
+    // }
+    // var utilStr = {   
+    //     //is String (boole)
+    //     isString: function (s){
+    //     	return typeof(s) == "string";
+    //     },    
+    //     //is String empty (boole)
+    //     isEmpty: function (s){
+    //         return s == "";
+    //     },
+    //     //is String within range (boole)
+    //     isRange(s, min, max){
+    //         return min <= s.length && s.length <= max; 
+    //     }
+    // }
+    // //TODO: how to load an (a file) for separating SVG 
+    // var utilFile = {
+    //     loadJs: function(path) {
+    //         script = document.createElement("script");
+    //         script.setAttribute("type", "text/javascript");
+    //         script.setAttribute("src", path);
 
-            if (head = document.getElementsByTagName("head")[0]) {
-                head.appendChild(script);
-                console.log("script loaded... " + path);
-            }
-        },
-        //include("./svg/knightB.html");
-        include: function(filePath) {
-            var result = null;
-            console.log("result: " + result);
-            var xmlhttp = new XMLHttpRequest();
-            xmlhttp.open("GET", filePath, false);
-            xmlhttp.send();
-            if (xmlhttp.status==200) {
-                result = xmlhttp.responseText;
-            }
-            console.log("result: " + result);
-            console.log(xmlhttp);
-            return result;
-        },
-        //document write
-        write: function(element, string) {
-            //document.writeln(string); //can't write from async 
-            //error:
-            //  Failed to execute 'write' on 'Document': It isn't possible 
-            //  to write into a document from an asynchronously-loaded external script unless it is explicitly opened.
-            var elem = document.getElementById(element);
-            var existingText = elem.innerHTML;
-            elem.innerHTML = existingText + string;     //add to top of checkered grid
-        }
-    }
+    //         if (head = document.getElementsByTagName("head")[0]) {
+    //             head.appendChild(script);
+    //             console.log("script loaded... " + path);
+    //         }
+    //     },
+    //     //include("./svg/knightB.html");
+    //     include: function(filePath) {
+    //         var result = null;
+    //         console.log("result: " + result);
+    //         var xmlhttp = new XMLHttpRequest();
+    //         xmlhttp.open("GET", filePath, false);
+    //         xmlhttp.send();
+    //         if (xmlhttp.status==200) {
+    //             result = xmlhttp.responseText;
+    //         }
+    //         console.log("result: " + result);
+    //         console.log(xmlhttp);
+    //         return result;
+    //     },
+    //     //document write
+    //     write: function(element, string) {
+    //         //document.writeln(string); //can't write from async 
+    //         //error:
+    //         //  Failed to execute 'write' on 'Document': It isn't possible 
+    //         //  to write into a document from an asynchronously-loaded external script unless it is explicitly opened.
+    //         var elem = document.getElementById(element);
+    //         var existingText = elem.innerHTML;
+    //         elem.innerHTML = existingText + string;     //add to top of checkered grid
+    //     }
+    // }
     //utilFile.loadJs("./svg/knightB.html");
     utilFile.loadJs("./js/knightB.js");
 
