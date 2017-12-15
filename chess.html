@@ -39,13 +39,23 @@
             user-select: none;
             pointer-events: none;
         }
+        div {
+            background: none;   /* takes out default background from style.css */
+        }
+        #knightB {
+            position: absolute;
+            float: right;
+        }
     
     </style>
 </head>
 
 <body>
     <h1>Chess</h1>
-    <div id="grid" style="background: none"></div>
+    <div id="grid">
+        <div id="knightB" class="centerAll"></div>
+    </div>
+    
 
     <script>
 
@@ -55,6 +65,8 @@
     //update for IMAGE (pieces)
     //functions for legal moves, etc.
     //game logic (checkmate, etc.)
+    
+    //split JS to separate files...
 
     //variables
 	var h = 640;		
@@ -197,6 +209,45 @@
             return min <= s.length && s.length <= max; 
         }
     }
+    //TODO: how to load an (a file) for separating SVG 
+    var utilFile = {
+        loadJs: function(path) {
+            script = document.createElement("script");
+            script.setAttribute("type", "text/javascript");
+            script.setAttribute("src", path);
+
+            if (head = document.getElementsByTagName("head")[0]) {
+                head.appendChild(script);
+                console.log("script loaded... " + path);
+            }
+        },
+        //include("./svg/knightB.html");
+        include: function(filePath) {
+            var result = null;
+            console.log("result: " + result);
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.open("GET", filePath, false);
+            xmlhttp.send();
+            if (xmlhttp.status==200) {
+                result = xmlhttp.responseText;
+            }
+            console.log("result: " + result);
+            console.log(xmlhttp);
+            return result;
+        },
+        //document write
+        write: function(element, string) {
+            //document.writeln(string); //can't write from async 
+            //error:
+            //  Failed to execute 'write' on 'Document': It isn't possible 
+            //  to write into a document from an asynchronously-loaded external script unless it is explicitly opened.
+            var elem = document.getElementById(element);
+            var existingText = elem.innerHTML;
+            elem.innerHTML = existingText + string;     //add to top of checkered grid
+        }
+    }
+    //utilFile.loadJs("./svg/knightB.html");
+    utilFile.loadJs("./js/knightB.js");
 
     //grid object
     function gridData() {
@@ -241,6 +292,7 @@
 
     var grid = d3.select("#grid")
         .append("svg")
+        .attr("id", "svgChess")
         .attr("width", w)
         .attr("height", h)
         .attr("class", "centerAll")       //center on screen (CSS)
